@@ -42,14 +42,14 @@ export class TypeObject implements Node {
     childrens: Key[];
     isArray: false;
     parent: Node | null;
-    isRequired: false;
+    isRequired: boolean;
     constructor(parent: Node | null, childrens: Key[]) {
         this.type = TypeNode.TypeObject;
         this.parent = parent;
         this.value = "";
         this.childrens = childrens;
         this.isArray = false;
-        this.isRequired = false;
+        this.isRequired = true;
     }
 }
 
@@ -66,7 +66,7 @@ export class Key implements Node {
         this.value = value;
         this.childrens = childrens;
         this.isArray = false;
-        this.isRequired = false;
+        this.isRequired = true;
     }
 }
 
@@ -86,7 +86,7 @@ export class Compo implements Node {
         this.value = "";
         this.childrens = childrens;
         this.isArray = false;
-        this.isRequired = false;
+        this.isRequired = true;
     }
 }
 
@@ -104,7 +104,7 @@ export class TypeBase implements Node {
         this.value = value;
         this.childrens = [];
         this.isArray = false;
-        this.isRequired = false;
+        this.isRequired = true;
     }
 }
 

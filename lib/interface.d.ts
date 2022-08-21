@@ -27,7 +27,7 @@ export declare class TypeObject implements Node {
     childrens: Key[];
     isArray: false;
     parent: Node | null;
-    isRequired: false;
+    isRequired: boolean;
     constructor(parent: Node | null, childrens: Key[]);
 }
 export declare class Key implements Node {

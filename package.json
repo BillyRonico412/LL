@@ -1,6 +1,6 @@
 {
   "name": "@ronico.billy/ll",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "Scanner and parser based to grammar LL",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
