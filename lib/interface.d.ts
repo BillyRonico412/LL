@@ -19,6 +19,7 @@ export interface Node {
     value: string;
     childrens: Node[];
     isArray: boolean;
+    isRequired: boolean;
 }
 export declare class TypeObject implements Node {
     type: TypeNode.TypeObject;
@@ -26,6 +27,7 @@ export declare class TypeObject implements Node {
     childrens: Key[];
     isArray: false;
     parent: Node | null;
+    isRequired: false;
     constructor(parent: Node | null, childrens: Key[]);
 }
 export declare class Key implements Node {
@@ -34,6 +36,7 @@ export declare class Key implements Node {
     value: string;
     childrens: Compo[];
     isArray: false;
+    isRequired: boolean;
     constructor(parent: TypeObject, value: string, childrens: Compo[]);
 }
 export declare class Compo implements Node {
@@ -42,6 +45,7 @@ export declare class Compo implements Node {
     value: string;
     childrens: (Compo | TypeObject | TypeBase)[];
     isArray: false;
+    isRequired: boolean;
     constructor(parent: Key | Compo, childrens: (Compo | TypeObject | TypeBase)[]);
 }
 export declare class TypeBase implements Node {
@@ -50,6 +54,7 @@ export declare class TypeBase implements Node {
     value: "number" | "string" | "boolean";
     childrens: [];
     isArray: false;
+    isRequired: boolean;
     constructor(parent: Compo, value: "number" | "string" | "boolean");
 }
 export interface Production {

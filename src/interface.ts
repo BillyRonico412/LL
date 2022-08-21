@@ -33,6 +33,7 @@ export interface Node {
     value: string;
     childrens: Node[];
     isArray: boolean;
+    isRequired: boolean;
 }
 
 export class TypeObject implements Node {
@@ -41,12 +42,14 @@ export class TypeObject implements Node {
     childrens: Key[];
     isArray: false;
     parent: Node | null;
+    isRequired: false;
     constructor(parent: Node | null, childrens: Key[]) {
         this.type = TypeNode.TypeObject;
         this.parent = parent;
         this.value = "";
         this.childrens = childrens;
         this.isArray = false;
+        this.isRequired = false;
     }
 }
 
@@ -56,12 +59,14 @@ export class Key implements Node {
     value: string;
     childrens: Compo[];
     isArray: false;
+    isRequired: boolean;
     constructor(parent: TypeObject, value: string, childrens: Compo[]) {
         this.type = TypeNode.Key;
         this.parent = parent;
         this.value = value;
         this.childrens = childrens;
         this.isArray = false;
+        this.isRequired = false;
     }
 }
 
@@ -71,6 +76,7 @@ export class Compo implements Node {
     value: string;
     childrens: (Compo | TypeObject | TypeBase)[];
     isArray: false;
+    isRequired: boolean;
     constructor(
         parent: Key | Compo,
         childrens: (Compo | TypeObject | TypeBase)[]
@@ -80,6 +86,7 @@ export class Compo implements Node {
         this.value = "";
         this.childrens = childrens;
         this.isArray = false;
+        this.isRequired = false;
     }
 }
 
@@ -89,6 +96,7 @@ export class TypeBase implements Node {
     value: "number" | "string" | "boolean";
     childrens: [];
     isArray: false;
+    isRequired: boolean;
 
     constructor(parent: Compo, value: "number" | "string" | "boolean") {
         this.type = TypeNode.TypeBase;
@@ -96,6 +104,7 @@ export class TypeBase implements Node {
         this.value = value;
         this.childrens = [];
         this.isArray = false;
+        this.isRequired = false;
     }
 }
 
