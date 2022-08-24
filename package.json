@@ -1,25 +1,27 @@
 {
-  "name": "@ronico.billy/ll",
-  "version": "0.0.7",
-  "description": "Scanner and parser based to grammar LL",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
-  "files": ["./lib/**/*"],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "Ronico BILLY",
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/BillyRonico412/LL.git"
-  },
-  "bugs": {
-    "url": "https://github.com/BillyRonico412/LL/issues"
-  },
-  "homepage": "https://github.com/BillyRonico412/LL#readme",
-  "devDependencies": {
-    "typescript": "^4.7.4"
-  }
+    "name": "@ronico.billy/ll",
+    "version": "0.0.7",
+    "description": "Scanner and parser based to grammar LL",
+    "main": "./lib/index.js",
+    "types": "./lib/index.d.ts",
+    "files": [
+        "./lib/**/*"
+    ],
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "Ronico BILLY",
+    "license": "ISC",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/BillyRonico412/LL.git"
+    },
+    "bugs": {
+        "url": "https://github.com/BillyRonico412/LL/issues"
+    },
+    "homepage": "https://github.com/BillyRonico412/LL#readme",
+    "devDependencies": {
+        "typescript": "^4.7.4"
+    }
 }
