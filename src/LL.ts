@@ -62,7 +62,6 @@ export const LL = (
         terms: [...grammar.terms, symbolEndLL],
         noTerms: [...grammar.noTerms, symbolStartLL],
         productions: [
-            ...grammar.productions,
             {
                 noTerm: symbolStartLL,
                 sequence: [
@@ -75,6 +74,7 @@ export const LL = (
                     })(),
                 ],
             },
+            ...grammar.productions,
         ],
         firstSymbol: symbolStartLL,
     };
