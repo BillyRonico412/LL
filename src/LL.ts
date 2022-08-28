@@ -1,4 +1,10 @@
-import { AnalysisTable, Grammar, Production, LLInterface } from "./interface";
+import {
+    AnalysisTable,
+    Grammar,
+    Production,
+    LLInterface,
+    Lookahead,
+} from "./interface";
 
 interface Follow {
     noterm: string;
@@ -111,7 +117,6 @@ export const LL = (
         } else {
             return follow(k, symbols[0].noterm);
         }
-        console.log(symbols);
         throw new Error("First Error");
     };
 
@@ -157,12 +162,19 @@ export const LL = (
         ]);
     };
 
-    const computeAnalysisTables = (): AnalysisTable[] => {
-        const res: AnalysisTable[] = [];
+    const computeAnalysisTables = (): {
+        analysisTables: AnalysisTable[];
+        lookaheads: Lookahead[];
+    } => {
+        const res: {
+            analysisTables: AnalysisTable[];
+            lookaheads: Lookahead[];
+        } = { analysisTables: [], lookaheads: [] };
         grammarLL.productions.forEach((production) => {
             const lookaheadForProd = lookahead(k, production);
+            res.lookaheads.push({ production, value: lookaheadForProd });
             lookaheadForProd.forEach((it) => {
-                res.push({
+                res.analysisTables.push({
                     noTerm: production.noTerm,
                     terms: it,
                     production,
@@ -172,22 +184,27 @@ export const LL = (
         return res;
     };
 
-    const analysisTables: AnalysisTable[] = computeAnalysisTables();
+    const computeAnalysisTablesRes = computeAnalysisTables();
+
+    const { analysisTables, lookaheads } = computeAnalysisTablesRes;
 
     const isLL = () =>
         grammarLL.noTerms.every((noTerm) => {
             const arrayArrayLookheadByNoTerm = analysisTables
                 .filter((analysisTable) => analysisTable.noTerm === noTerm)
                 .map((analysisTable) => analysisTable.terms);
-            const arrayLookheadByNoTerm: string[] = [];
-            arrayArrayLookheadByNoTerm.forEach((pArrayLookheadByNoTerm) => {
-                pArrayLookheadByNoTerm.forEach((pLookheadByNoTerm) => {
-                    arrayLookheadByNoTerm.push(pLookheadByNoTerm);
-                });
-            });
-            for (let i = 0; i < arrayLookheadByNoTerm.length; i++) {
-                for (let j = i + 1; j < arrayLookheadByNoTerm.length; j++) {
-                    if (arrayLookheadByNoTerm[i] === arrayLookheadByNoTerm[j]) {
+            for (let i = 0; i < arrayArrayLookheadByNoTerm.length; i++) {
+                for (
+                    let j = i + 1;
+                    j < arrayArrayLookheadByNoTerm.length;
+                    j++
+                ) {
+                    if (
+                        compareTwoArrayString(
+                            arrayArrayLookheadByNoTerm[i],
+                            arrayArrayLookheadByNoTerm[j]
+                        )
+                    ) {
                         return false;
                     }
                 }
@@ -196,7 +213,14 @@ export const LL = (
         });
 
     if (isLL()) {
-        return { k, analysisTables, lookahead, grammar: grammarLL, symbolStartLL, symbolEndLL };
+        return {
+            k,
+            analysisTables,
+            lookaheads,
+            grammar: grammarLL,
+            symbolStartLL,
+            symbolEndLL,
+        };
     }
     return false;
 };

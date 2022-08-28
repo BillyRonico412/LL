@@ -52,11 +52,16 @@ export interface Grammar {
     firstSymbol: string;
 }
 
+export interface Lookahead {
+    production: Production;
+    value: string[][];
+}
+
 export interface LLInterface {
     k: number;
     grammar: Grammar;
     analysisTables: AnalysisTable[];
-    lookahead: (k: number, production: Production) => string[][];
+    lookaheads: Lookahead[];
     symbolStartLL: string;
     symbolEndLL: string;
 }

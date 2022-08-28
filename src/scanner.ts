@@ -40,7 +40,6 @@ export const scanner = (
                     continue;
                 } else {
                     const tokenAfter = text.slice(lookHead, i + 2);
-                    console.log(tokenAfter);
                     const lexemValidAfter = lexems.find((lexem) => {
                         if (new RegExp(lexem.value).test(tokenAfter)) {
                             return true;
@@ -48,7 +47,6 @@ export const scanner = (
                         return false;
                     });
                     if (lexemValidAfter) {
-                        console.log(lexemValidAfter);
                         if (lexemValidAfter.name === lexemOnExtension.name) {
                             continue;
                         }
