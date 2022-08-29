@@ -3,6 +3,7 @@ import {
     ErrorSyntax,
     Grammar,
     LLInterface,
+    ParseInfo,
     Token,
 } from "./interface";
 
@@ -67,7 +68,9 @@ export const parser = (
         throw new Error("Parser Error!");
     }
 
-    const parserFunc = (tokens: Token[]): boolean | ErrorSyntax => {
+    const parserFunc = (
+        tokens: Token[]
+    ): { res: boolean | ErrorSyntax; parseInfos: ParseInfo[] } => {
         const tokensLL = [...tokens];
         for (let i = 0; i < LL.k; i++) {
             tokensLL.push({
@@ -82,10 +85,14 @@ export const parser = (
         const parserFuncFunc = (
             tokens: Token[],
             symbols: string[] = [LL.symbolStartLL],
-            tokenAlreadyRead: Token[] = []
-        ): boolean | ErrorSyntax => {
+            tokenAlreadyRead: Token[] = [],
+            parseInfos: ParseInfo[] = []
+        ): { res: boolean | ErrorSyntax; parseInfos: ParseInfo[] } => {
             if (tokens.length === 0 && symbols.length === 0) {
-                return true;
+                return {
+                    res: true,
+                    parseInfos,
+                };
             }
             if (
                 tokens.length !== 0 &&
@@ -94,39 +101,47 @@ export const parser = (
             ) {
                 const myCoordError = coordError(tokenAlreadyRead);
                 return {
-                    ...myCoordError,
-                    message: "Syntax Error",
-                    stringWithColored:
-                        tokenAlreadyRead.map((tok) => tok.value).join("") +
-                        "*" +
-                        tokens.map((tok) => tok.value).join("") +
-                        "*",
+                    res: {
+                        ...myCoordError,
+                        message: "Syntax Error",
+                        stringWithColored:
+                            tokenAlreadyRead.map((tok) => tok.value).join("") +
+                            "*" +
+                            tokens.map((tok) => tok.value).join("") +
+                            "*",
+                    },
+                    parseInfos,
                 };
             }
 
             if (tokens.length === 0 && symbols.length !== 0) {
                 const myCoordError = coordError(tokenAlreadyRead);
                 return {
-                    ...myCoordError,
-                    message:
-                        "Syntax Error, Waiting [" +
-                        waitingTokenBySymbol(
-                            symbols[0],
-                            LL.grammar.noTerms,
-                            LL.analysisTables
-                        ) +
-                        "]",
-                    stringWithColored:
-                        tokenAlreadyRead.map((tok) => tok.value).join("") +
-                        "* *",
+                    res: {
+                        ...myCoordError,
+                        message:
+                            "Syntax Error, Waiting [" +
+                            waitingTokenBySymbol(
+                                symbols[0],
+                                LL.grammar.noTerms,
+                                LL.analysisTables
+                            ) +
+                            "]",
+                        stringWithColored:
+                            tokenAlreadyRead.map((tok) => tok.value).join("") +
+                            "* *",
+                    },
+                    parseInfos,
                 };
             }
 
             if (ignoreTerms.includes(tokens[0].lexem.name)) {
-                return parserFuncFunc(tokens.slice(1), symbols, [
-                    ...tokenAlreadyRead,
-                    tokens[0],
-                ]);
+                return parserFuncFunc(
+                    tokens.slice(1),
+                    symbols,
+                    [...tokenAlreadyRead, tokens[0]],
+                    parseInfos
+                );
             }
             if (LL.grammar.noTerms.includes(symbols[0])) {
                 const analyseTableValid = LL.analysisTables.find(
@@ -142,9 +157,29 @@ export const parser = (
                         analyseTableValid.production.sequence.length === 1 &&
                         analyseTableValid.production.sequence[0] === ""
                     ) {
-                        return parserFuncFunc(tokens, symbols.slice(1), [
-                            ...tokenAlreadyRead,
-                        ]);
+                        return parserFuncFunc(
+                            tokens,
+                            symbols.slice(1),
+                            [...tokenAlreadyRead],
+                            [
+                                ...parseInfos,
+                                {
+                                    word:
+                                        parseInfos.length === 0
+                                            ? tokens.map((it) => it.value)
+                                            : typeof parseInfos[
+                                                  parseInfos.length - 1
+                                              ].action === "string"
+                                            ? parseInfos[
+                                                  parseInfos.length - 1
+                                              ].word.slice(1)
+                                            : parseInfos[parseInfos.length - 1]
+                                                  .word,
+                                    action: analyseTableValid.production,
+                                    stack: symbols,
+                                },
+                            ]
+                        );
                     } else {
                         return parserFuncFunc(
                             tokens,
@@ -152,33 +187,73 @@ export const parser = (
                                 ...analyseTableValid.production.sequence,
                                 ...symbols.slice(1),
                             ],
-                            [...tokenAlreadyRead]
+                            [...tokenAlreadyRead],
+                            [
+                                ...parseInfos,
+                                {
+                                    word:
+                                        parseInfos.length === 0
+                                            ? tokens.map((it) => it.value)
+                                            : typeof parseInfos[
+                                                  parseInfos.length - 1
+                                              ].action === "string"
+                                            ? parseInfos[
+                                                  parseInfos.length - 1
+                                              ].word.slice(1)
+                                            : parseInfos[parseInfos.length - 1]
+                                                  .word,
+                                    action: analyseTableValid.production,
+                                    stack: symbols,
+                                },
+                            ]
                         );
                     }
                 } else {
                     return {
-                        ...coordError(tokenAlreadyRead),
-                        message:
-                            "Syntax Error, Waiting [" +
-                            waitingTokenBySymbol(
-                                symbols[0],
-                                LL.grammar.noTerms,
-                                LL.analysisTables
-                            ) +
-                            "]",
-                        stringWithColored:
-                            tokenAlreadyRead.map((tok) => tok.value).join("") +
-                            "*" +
-                            tokens.map((tok) => tok.value).join("") +
-                            "*",
+                        res: {
+                            ...coordError(tokenAlreadyRead),
+                            message:
+                                "Syntax Error, Waiting [" +
+                                waitingTokenBySymbol(
+                                    symbols[0],
+                                    LL.grammar.noTerms,
+                                    LL.analysisTables
+                                ) +
+                                "]",
+                            stringWithColored:
+                                tokenAlreadyRead
+                                    .map((tok) => tok.value)
+                                    .join("") +
+                                "*" +
+                                tokens.map((tok) => tok.value).join("") +
+                                "*",
+                        },
+                        parseInfos,
                     };
                 }
             } else if (tokens[0].lexem.name === symbols[0]) {
                 pop(tokens[0].lexem.name, tokens[0].value);
-                return parserFuncFunc(tokens.slice(1), symbols.slice(1), [
-                    ...tokenAlreadyRead,
-                    tokens[0],
-                ]);
+                return parserFuncFunc(
+                    tokens.slice(1),
+                    symbols.slice(1),
+                    [...tokenAlreadyRead, tokens[0]],
+                    [
+                        ...parseInfos,
+                        {
+                            word:
+                                parseInfos.length === 0
+                                    ? tokens.map((it) => it.value)
+                                    : typeof parseInfos[parseInfos.length - 1]
+                                          .action === "string"
+                                    ? parseInfos[
+                                          parseInfos.length - 1
+                                      ].word.slice(1)
+                                    : parseInfos[parseInfos.length - 1].word,
+                            action: tokens[0].value,
+                            stack: symbols,
+                        },
+                    ]
+                );
             } else {
                 throw new Error(`Parser Error`);
             }

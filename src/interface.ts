@@ -65,3 +65,9 @@ export interface LLInterface {
     symbolStartLL: string;
     symbolEndLL: string;
 }
+
+export interface ParseInfo {
+    word: string[];
+    stack: string[];
+    action: Production | string;
+}
